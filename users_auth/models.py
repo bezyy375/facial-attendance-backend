@@ -2,22 +2,29 @@ from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.db import models
 from django.db.models import TextField
 
+import os
+import datetime
+import uuid
+
 
 class Organization(models.Model):
     name = TextField(blank=False)
     domain = TextField(blank=True)
 
 
+
 def member_picture_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT / user_<id>/<filename>
-    return f'media/member/{filename}'
+    print(instance.id)
+    return f'media/member/{instance.id}.jpg'
 
 
 class Member(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=True)
     name = TextField(blank=False)
-    organization = models.ForeignKey(Organization, null=True, blank=True, on_delete=models.CASCADE,related_name="members")
+    organization = models.ForeignKey(Organization, null=True, blank=True, on_delete=models.CASCADE,
+                                     related_name="members")
     picture = models.FileField(upload_to=member_picture_directory_path)
-
 
 class Attendance(models.Model):
     member = models.ForeignKey(Member, on_delete=models.CASCADE, related_name="members")

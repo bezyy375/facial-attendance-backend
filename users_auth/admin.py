@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from users_auth.models import Member, Organization
+from users_auth.models import Member, Organization, Attendance
 
 # Register your models here.
 
@@ -69,6 +69,15 @@ class UserAdmin(BaseUserAdmin):
     filter_horizontal = ()
 
 
+
+
 admin.site.register(MyUser, UserAdmin)
 admin.site.register(Organization)
 admin.site.register(Member)
+
+
+class AttendanceAdmin(admin.ModelAdmin):
+    readonly_fields = ['date_time']
+
+
+admin.site.register(Attendance, AttendanceAdmin)
