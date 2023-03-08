@@ -12,6 +12,49 @@ from users_auth.models import Attendance, Member
 
 from authatt.settings import BASE_DIR
 
+import numpy as np
+import face_recognition
+import cv2
+
+
+
+'''
+#Disabling pre-training
+known_face_encodings = []
+known_face_names = []
+known_face_regions = []
+
+face_locations = []
+face_encodings = []
+face_names = []
+path = 'media/member'
+
+filenames=os.listdir(path)
+for filename in filenames:
+    
+
+    print('Feeding',filename )
+    try:
+    # if (True):
+        if len(known_face_names)<70:
+            second_image = path + "/" + filename
+            firstface1 = face_recognition.load_image_file(second_image)
+            first_face_encoding = face_recognition.face_encodings(firstface1)[0]
+            known_face_encodings.append(first_face_encoding)
+            # name = os.path.splitext(filename)[0]
+            known_face_names.append(filename)
+            known_face_regions.append(str(dir))
+
+
+            
+    except:
+        print('Exception Raised in Feeding!!')
+        pass
+print(known_face_names)
+print(known_face_regions)
+'''
+
+
 
 
 # Create your views here.
@@ -26,14 +69,134 @@ class AttendanceViewSet(ModelViewSet):
     serializer_class = AttendanceSerializer
     permission_classes = [IsAuthenticated]
 
+
+    
+
+        
+    
     def get_queryset(self):
         return Attendance.objects.all()
 
 
+
+
+
+
+
+    
+
     def create(self, request, *args, **kwargs):
 
 
-     
+        known_face_encodings = []
+        known_face_names = []
+        known_face_regions = []
+
+        face_locations = []
+        face_encodings = []
+        face_names = []
+        path = 'media/member'
+
+        filenames=os.listdir(path)
+        for filename in filenames:
+            
+
+            print('Feeding',filename )
+            if('.DS_Store' in filename):
+                continue
+            try:
+            # if (True):
+                if len(known_face_names)<70:
+                    second_image = path + "/" + filename
+                    firstface1 = face_recognition.load_image_file(second_image)
+                    first_face_encoding = face_recognition.face_encodings(firstface1)
+
+                    if(not len(first_face_encoding)==1):
+                        print('Ignoring Face Feed for ', second_image)
+                        continue
+                    
+                    first_face_encoding = first_face_encoding[0]
+
+                    known_face_encodings.append(first_face_encoding)
+                    # name = os.path.splitext(filename)[0]
+                    known_face_names.append(filename)
+                    known_face_regions.append(str(dir))
+                    
+            except Exception as e:
+                print('Exception Raised in Feeding!!', e)
+                pass
+        print(known_face_names)
+        print(known_face_regions)
+
+
+        def getresult(first_image):
+            first_image = str(first_image)
+
+  
+            folder = 'media/test_pic'
+            print("IN SYSTem",first_image)
+  
+ 
+            first_image = first_image.replace(")", "")
+            first_image = first_image.replace("(", "")
+
+            c = 23
+            print("AFTER",first_image)
+            try:
+            # if(True):
+
+
+   
+                print("Before Loading image file")
+                unknown_image = face_recognition.load_image_file(first_image)
+                
+                print("Before Loading image encodings")
+                unknown_encoding = face_recognition.face_encodings(unknown_image)[0]
+
+                print("AFTER unknown_encoding",first_image)
+
+
+
+
+
+                '''
+                frame=cv2.imread(first_image)
+                small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+                print('After Resizing')
+
+
+                # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
+                # rgb_small_frame = small_frame[:, :, ::-1]
+                test_face_locations = face_recognition.face_locations(small_frame)
+                print('After Face Locations')
+
+                unknown_encoding = face_recognition.face_encodings(small_frame, test_face_locations)
+                '''
+
+
+                results = face_recognition.compare_faces(known_face_encodings, unknown_encoding)
+                print('/n/nMatching Results:\n',results,'\n\n')
+
+
+                if True in results:
+                    first_match_index = results.index(True)
+                    founname = known_face_names[first_match_index]
+                    print("UserID", founname)
+                    return True, founname.split('.')[0]
+
+
+
+            except Exception as e:
+                print('Exception Raised in Recognition!!', e)
+                pass
+
+            return False, 'Member Not Found!'
+
+
+            
+
+
+        
 
         test_file=self.request.FILES.get('picture')
         terminal_code = request.data['terminal_code']
@@ -54,15 +217,15 @@ class AttendanceViewSet(ModelViewSet):
         if not os.path.exists(destination_dir):
             os.makedirs(destination_dir)
 
-
-        destination = open(destination_dir+'/'+x+'__'+ test_file.name, 'wb+')
+        destination_img = destination_dir+'/'+x+'__'+ test_file.name
+        destination = open(destination_img, 'wb+')
 
         for chunk in test_file.chunks():
             destination.write(chunk)
         destination.close()
         #so file in test_pic read file and apply face match here
         # add logic here to mark attended
-        is_match, member_id =True, '2dd0bb6b-018b-47ea-a3e0-564891248cdb'
+        is_match, member_id = getresult(destination_img)
 
 
         
@@ -77,8 +240,9 @@ class AttendanceViewSet(ModelViewSet):
             return Response(
                 {
                     "success": True,
-                    "id": "sd",
+                    "id": member_id,
                     "msg": "The attendance marked successfully",
+                    "member":  {"id": member.id, "name": member.name, "organization": member.organization.name,},
                 },
                 status=status.HTTP_201_CREATED,
             )

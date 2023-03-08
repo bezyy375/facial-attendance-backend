@@ -1,0 +1,121 @@
+   def getresult(first_image):
+            first_image = str(first_image)
+
+            # import os, shutil
+            folder = 'media/test_pic'
+            print("IN SYSTem",first_image)
+            # if "media/pic_folder/" in first_image:
+            #     folder = 'media/pic_folder'
+
+            mindis = 0.49999999
+            founname = 'Not Found'
+            first_image = first_image.replace(")", "")
+            first_image = first_image.replace("(", "")
+
+            c = 23
+            print("AFTER",first_image)
+            # known_image = face_recognition.load_image_file(first_image)
+        
+            # try:
+            if(True):
+
+                print("Before Loading image file")
+                unknown_image = face_recognition.load_image_file(first_image)
+                
+                print("Before Loading image encodings")
+                unknown_encoding = face_recognition.face_encodings(unknown_image)[0]
+
+                print("AFTER unknown_encoding",first_image)
+
+
+                results = face_recognition.compare_faces(known_face_encodings, unknown_encoding)
+
+
+                if True in results:
+                    first_match_index = results.index(True)
+                    name = known_face_names[first_match_index]
+                    print("UserID", name)
+
+
+              
+
+
+                
+
+                '''
+                print('Before Training')
+
+                path = 'media/member'
+                filenames=os.listdir(path)
+                sys_know_encodings = []
+                
+                for filename in filenames:
+                    filename = path+'/'+filename
+                    print('Feeding for Recognition', filename)
+                    known_image = face_recognition.load_image_file(filename)
+                    biden_encoding = face_recognition.face_encodings(known_image)[0]
+                    sys_know_encodings.append(biden_encoding)
+
+                print('Before Encoding')
+                unknown_image = face_recognition.load_image_file(first_image)
+                unknown_encoding = face_recognition.face_encodings(unknown_image)[0]
+
+                print('Before Results')
+                results = face_recognition.compare_faces(sys_know_encodings, unknown_encoding)
+                '''
+
+               
+
+                # frame=cv2.imread(first_image)
+                # small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+                # print('After Resizing')
+
+
+                # # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
+                # rgb_small_frame = small_frame[:, :, ::-1]
+                # test_face_locations = face_recognition.face_locations(rgb_small_frame)
+                # print('After Face Locations')
+
+                # test_face_encodings = face_recognition.face_encodings(rgb_small_frame, test_face_locations)
+
+                # cv2.imwrite('test_smal_frame.png', rgb_small_frame)
+                
+
+
+                # print('Before compare face', len(known_face_encodings))
+                # results = face_recognition.compare_faces(known_face_encodings, test_face_encodings)
+                # print('After compare face')
+
+
+
+                print("\n\n\n\Results::\n")
+                print(results)
+                print("\n\n\n")
+
+
+                
+
+                # for face_encoding in face_encodings:
+                #     # See if the face is a match for the known face(s)
+                #     matches = face_recognition.compare_faces(known_face_encodings, face_encoding, 0.499999)
+
+                #     # If a match was found in known_face_encodings, just use the first one.
+                #     if True in matches:
+                #         # first_match_index = matches.index(True)
+                #         matc=known_face_regions.index(region_parm)
+                #         # name = known_face_names[first_match_index]
+                #         # reg=known_face_regions[first_match_index]
+                #         if matches[matc]:
+                #             name = known_face_names[matc]
+                #             founname=name
+
+
+
+            # except:
+            #     print('Exception Raised!!')
+            #     pass
+
+            return False, founname
+
+
+            
