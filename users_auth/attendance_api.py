@@ -88,6 +88,75 @@ class AttendanceViewSet(ModelViewSet):
     def create(self, request, *args, **kwargs):
 
 
+
+
+        test_file=self.request.FILES.get('picture')
+        terminal_code = request.data['terminal_code']
+        
+        
+        print(test_file)
+
+
+        x = datetime.datetime.now()
+        x = str(x)
+        x = x.replace(":", "__")
+        x = x.replace(".", "__")
+        x = x.replace("-", "__")
+
+        destination_dir = str(BASE_DIR)+'/media/test_pic/'+terminal_code
+
+
+        if not os.path.exists(destination_dir):
+            os.makedirs(destination_dir)
+
+        destination_img = destination_dir+'/'+x+'__'+ test_file.name
+        destination = open(destination_img, 'wb+')
+
+        for chunk in test_file.chunks():
+            destination.write(chunk)
+        destination.close()
+
+
+
+        print("Before Loading image file")
+        unknown_image = face_recognition.load_image_file(destination_img)
+        
+        print("Before Loading image encodings")
+        unknown_encoding = face_recognition.face_encodings(unknown_image)
+
+        n_faces = len(unknown_encoding)
+        if(n_faces==0):
+            return Response(
+            {
+                "success": False,
+                "msg": "Invalid Image. Found no face in image.",
+                "n_faces": n_faces
+            },
+            status=status.HTTP_404_NOT_FOUND,
+            )
+        
+        elif (n_faces>1):
+            return Response(
+            {
+                "success": False,
+                "msg": "Invalid Image. Found multiple faces in image.",
+                "n_faces": n_faces
+            },
+            status=status.HTTP_412_PRECONDITION_FAILED,
+            )
+            
+
+
+
+        print("AFTER unknown_encoding",destination_img)
+        unknown_encoding = unknown_encoding[0]
+
+
+
+
+
+
+
         known_face_encodings = []
         known_face_names = []
         known_face_regions = []
@@ -198,31 +267,9 @@ class AttendanceViewSet(ModelViewSet):
 
         
 
-        test_file=self.request.FILES.get('picture')
-        terminal_code = request.data['terminal_code']
-        
-        
-        print(test_file)
 
 
-        x = datetime.datetime.now()
-        x = str(x)
-        x = x.replace(":", "__")
-        x = x.replace(".", "__")
-        x = x.replace("-", "__")
 
-        destination_dir = str(BASE_DIR)+'/media/test_pic/'+terminal_code
-
-
-        if not os.path.exists(destination_dir):
-            os.makedirs(destination_dir)
-
-        destination_img = destination_dir+'/'+x+'__'+ test_file.name
-        destination = open(destination_img, 'wb+')
-
-        for chunk in test_file.chunks():
-            destination.write(chunk)
-        destination.close()
         #so file in test_pic read file and apply face match here
         # add logic here to mark attended
         is_match, member_id = getresult(destination_img)

@@ -58,15 +58,24 @@ class MemberViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Lis
         first_face_encoding = face_recognition.face_encodings(firstface1)
         n_faces = len(first_face_encoding)
 
-        if(not n_faces==1):
-            print('Ignoring Face Feed for ', destination_img)
+        if(n_faces==0):
             return Response(
             {
                 "success": False,
-                "msg": "Cannot add member. Please change Image.",
-                'n-faces': n_faces
+                "msg": "Invalid Image. Found no face in image.",
+                "n_faces": n_faces
             },
-            status=status.HTTP_201_CREATED,
+            status=status.HTTP_404_NOT_FOUND,
+            )
+        
+        elif (n_faces>1):
+            return Response(
+            {
+                "success": False,
+                "msg": "Invalid Image. Found multiple faces in image.",
+                "n_faces": n_faces
+            },
+            status=status.HTTP_412_PRECONDITION_FAILED,
             )
             
                     
