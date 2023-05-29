@@ -68,8 +68,9 @@ class MemberViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Lis
 
         if not os.path.exists(destination_dir):
             os.makedirs(destination_dir)
-
         destination_img = destination_dir+'/' + test_file.name
+        if (len(destination_img.split('.')) == 1):
+            destination_img = destination_img+".png"
         destination = open(destination_img, 'wb+')
 
         for chunk in test_file.chunks():

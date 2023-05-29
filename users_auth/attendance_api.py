@@ -190,8 +190,7 @@ class AttendanceViewSet(ModelViewSet):
                     unknown_image, cv2.COLOR_BGR2RGB)
 
                 # Image resizing
-                image_resize(
-                    cv2.imread(unknown_image), width=500)
+                image_resize(unknown_image, width=500)
 
                 print("Before Loading image encodings")
                 unknown_encoding = face_recognition.face_encodings(bgr_unknown_image)[
